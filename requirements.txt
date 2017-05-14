@@ -1,0 +1,3 @@
+flask
+pubnub>=4.0.10
+nexmo
