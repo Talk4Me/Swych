@@ -32,14 +32,18 @@ def hello_world():
 
 @app.route('/inbound')
 def inbound():
-    sender = request.args.get('msisdn')
-    text = request.args.get('text')
-    print('Sender=' + request.args.get('msisdn'))
-    print('Message=' + request.args.get('text'))
+    try:
+        sender = request.args.get('msisdn')
+        text = request.args.get('text')
+        print('Sender=' + request.args.get('msisdn'))
+        print('Message=' + request.args.get('text'))
 
-    message = {"SenderType":"SMS", 'SenderId': sender, "Content": text, "TimeStamp": str(datetime.datetime.now())}
-    pubnub.publish().channel("inbound").message(message).async(publish_callback)
-
+        message = {"SenderType":"SMS", 'SenderId': sender, "Content": text, "TimeStamp": str(datetime.datetime.now())}
+        pubnub.publish().channel("inbound").message(message).async(publish_callback)
+    except:
+        print "YOU DONE FUCKED UP"
+        return ""
+ 
     return ""
 
 class MySubscribeCallback(SubscribeCallback):
@@ -70,8 +74,12 @@ class MySubscribeCallback(SubscribeCallback):
 
     def message(self, pubnub, message):
         print('Received over pubnub: '+ str(message.message))
-        sender = message.message["SenderId"] 
-        content = message.message["Content"]
+        try:
+            sender = message.message["SenderId"] 
+            content = message.message["Content"]
+        except:
+            print "YOU DONE FUCKED UP"
+            return
         self.sendMessage(sender, content)
 
 pubnub.add_listener(MySubscribeCallback())
